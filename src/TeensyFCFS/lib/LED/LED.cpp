@@ -14,16 +14,16 @@ LED::LED(int pinRed, int pinBlue, int pinGreen)
     _blue = 255;
     _green = 255;
     
-    digitalWrite(_pinRed, LOW);
-    digitalWrite(_pinBlue, LOW);
-    digitalWrite(_pinGreen, LOW);
+    analogWrite(_pinRed, 0);
+    analogWrite(_pinBlue, 0);
+    analogWrite(_pinGreen, 0);
 }
 
 void LED::red()
 {
-    digitalWrite(_pinRed, HIGH);
-    digitalWrite(_pinBlue, LOW);
-    digitalWrite(_pinGreen, LOW);
+    analogWrite(_pinRed, 255);
+    analogWrite(_pinBlue, 0);
+    analogWrite(_pinGreen, 0);
     _red = 255;
     _blue = 0;
     _green = 0;
@@ -31,9 +31,9 @@ void LED::red()
 
 void LED::blue()
 {
-    digitalWrite(_pinRed, LOW);
-    digitalWrite(_pinBlue, HIGH);
-    digitalWrite(_pinGreen, LOW);
+    analogWrite(_pinRed, 0);
+    analogWrite(_pinBlue, 255);
+    analogWrite(_pinGreen, 0);
     _red = 0;
     _blue = 255;
     _green = 0;
@@ -41,9 +41,9 @@ void LED::blue()
 
 void LED::green()
 {
-    digitalWrite(_pinRed, LOW);
-    digitalWrite(_pinBlue, LOW);
-    digitalWrite(_pinGreen, HIGH);
+    analogWrite(_pinRed, 0);
+    analogWrite(_pinBlue, 0);
+    analogWrite(_pinGreen, 255);
     _red = 0;
     _blue = 0;
     _green = 255;
@@ -51,9 +51,9 @@ void LED::green()
 
 void LED::purple()
 {
-    digitalWrite(_pinRed, HIGH);
-    digitalWrite(_pinBlue, HIGH);
-    digitalWrite(_pinGreen, LOW);
+    analogWrite(_pinRed, 255);
+    analogWrite(_pinBlue, 255);
+    analogWrite(_pinGreen, 0);
     _red = 255;
     _blue = 255;
     _green = 0;
@@ -61,9 +61,9 @@ void LED::purple()
 
 void LED::white()
 {
-    digitalWrite(_pinRed, HIGH);
-    digitalWrite(_pinBlue, HIGH);
-    digitalWrite(_pinGreen, HIGH);
+    analogWrite(_pinRed, 255);
+    analogWrite(_pinBlue, 255);
+    analogWrite(_pinGreen, 255);
     _red = 255;
     _blue = 255;
     _green = 255;
@@ -88,7 +88,7 @@ void LED::on() //resume previous state
 
 void LED::off()
 {
-    digitalWrite(_pinRed, LOW);
-    digitalWrite(_pinBlue, LOW);
-    digitalWrite(_pinGreen, LOW);
+    analogWrite(_pinRed, 0);
+    analogWrite(_pinBlue, 0);
+    analogWrite(_pinGreen, 0);
 }

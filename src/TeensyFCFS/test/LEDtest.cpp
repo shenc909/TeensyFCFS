@@ -2,7 +2,7 @@
 #include "pindef.h"
 #include <LED.h>
 
-LED led = LED(LEDR, LEDG, LEDB);
+LED led = LED(LEDR, LEDB, LEDG);
 
 void setup() {
   // put your setup code here, to run once:
@@ -11,20 +11,19 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   led.on();
-  delay(500);
+  delay(1000);
   led.red();
-  delay(500);
+  delay(1000);
   led.green();
-  delay(500);
+  delay(1000);
   led.blue();
-  delay(500);
+  delay(1000);
   led.purple();
-  delay(500);
+  delay(1000);
   led.white();
-  delay(500);
-  led.rgb(0, 100, 100);
-  delay(500);
-  led.on();
-  delay(500);
+  delay(1000);
+  led.rgb(100, 100, 0);
+  delay(1000);
   led.off();
+  delay(1000);
 }
