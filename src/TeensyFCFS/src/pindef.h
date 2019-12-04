@@ -7,12 +7,12 @@
 #define SDA 8
 #define AD0 18
 
-#define CH1 39
-#define CH2 14
-#define CH3 15
+#define CH1 15
+#define CH2 39
+#define CH3 14
 #define CH4 16
-#define CH5 17
-#define CH6 18
+#define CH5 18
+#define CH6 17
 
 #define LEDR 35
 #define LEDG 36

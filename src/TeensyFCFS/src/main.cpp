@@ -5,6 +5,19 @@ unsigned int throttleTop, throttleBtm, rollTop, rollBtm, pitchTop, pitchBtm, yaw
 volatile unsigned int throttle, prev_throttle, roll, prev_roll, pitch, prev_pitch, yaw, prev_yaw, switch1, prev_switch1, switch2, prev_switch2;
 unsigned int throttleOut, rollOut, pitchOut, yawOut, switch1Out, switch2Out;
 
+throttleBtm = 1108;
+throttleTop = 1763;
+rollBtm = 1087;
+rollTop = 1907;
+pitchBtm = 1164;
+pitchTop = 1809;
+yawBtm = 1118;
+yawTop = 1883;
+switch1Btm = 1001;
+switch1Top = 2017;
+switch2Btm = 1001;
+switch2Top = 2017;
+
 void rising1();
 void rising2();
 void rising3();
@@ -17,6 +30,7 @@ void falling3();
 void falling4();
 void falling5();
 void falling6();
+// void calibrate();
 
 
 void setup() {
@@ -28,19 +42,49 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(CH4), rising4, RISING);
   attachInterrupt(digitalPinToInterrupt(CH5), rising5, RISING);
   attachInterrupt(digitalPinToInterrupt(CH6), rising6, RISING);
+  Serial.begin(9600);
+
+  // calibrate();
 
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
 
-  throttleOut = map(throttle, throttleBtm, throttleTop, 0, 100);
-  rollOut = map(roll, rollBtm, rollTop, -100, 100);
-  pitchOut = map(pitch, pitchBtm, pitchTop, -100, 100);
-  yawOut = map(yaw, yawBtm, yawTop, -100, 100);
-  switch1Out = map(switch1, switch1Btm, switch1Top, 0, 1);
-  rollOut = map(switch2, switch2Btm, switch2Top, 0, 1);
+  // throttleOut = map(throttle, throttleBtm, throttleTop, 0, 100);
+  // rollOut = map(roll, rollBtm, rollTop, -100, 100);
+  // pitchOut = map(pitch, pitchBtm, pitchTop, -100, 100);
+  // yawOut = map(yaw, yawBtm, yawTop, -100, 100);
+  // switch1Out = map(switch1, switch1Btm, switch1Top, 0, 1);
+  // switch2Out = map(switch2, switch2Btm, switch2Top, 0, 1);
   
+  // Serial.print(throttleBtm);
+  // Serial.print("\t");
+  // Serial.print(throttleTop);
+  // Serial.print("\t");
+  // Serial.print(rollBtm);
+  // Serial.print("\t");
+  // Serial.print(rollTop);
+  // Serial.print("\t");
+  // Serial.print(pitchBtm);
+  // Serial.print("\t");
+  // Serial.print(pitchTop);
+  // Serial.print("\t");
+  // Serial.println(yawBtm);
+
+  Serial.print(throttle);
+  Serial.print("\t | \t");
+  Serial.print(roll);
+  Serial.print("\t | \t");
+  Serial.print(pitch);
+  Serial.print("\t | \t");
+  Serial.print(yaw);
+  Serial.print("\t | \t");
+  Serial.print(switch1);
+  Serial.print("\t | \t");
+  Serial.println(switch2);
+
+  delay(1000);
 }
 
 /*///////////////////////////////////////////////////////////////
