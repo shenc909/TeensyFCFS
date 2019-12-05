@@ -4,21 +4,25 @@
 #include <quaternionFilters.h>
 #include <MPU9250.h>
 #include <PID_v1.h>
+#include <LED.h>
+
+LED led = LED(LEDR, LEDB, LEDG);
+
 
 //Define Variables we'll be connecting to
 double rollSetpoint, rollInput, rollOutput;
 double pitchSetpoint, pitchInput, pitchOutput;
 
 //Define the aggressive and conservative Tuning Parameters
-double aggKp=0.4, aggKi=0.02, aggKd=0.1;
-double consKp=0.1, consKi=0.005, consKd=0.025;
+double aggKp=4, aggKi=0.2, aggKd=1;
+double consKp=1, consKi=0.05, consKd=0.25;
 
 //Specify the links and initial tuning parameters
 PID rollPID(&rollInput, &rollOutput, &rollSetpoint, consKp, consKi, consKd, DIRECT);
 PID pitchPID(&pitchInput, &pitchOutput, &pitchSetpoint, consKp, consKi, consKd, DIRECT);
 
-#define PIDMIN -200
-#define PIDMAX 200
+#define PIDMIN -500
+#define PIDMAX 500
 
 
 #define AHRS true         // Set to false for basic data read
@@ -95,6 +99,20 @@ void calibrate() {
 /*///////////////////////////////////////////////////////////////
                         REMOTE ISRs
 *////////////////////////////////////////////////////////////////
+
+void rising1();
+void rising2();
+void rising3();
+void rising4();
+void rising5();
+void rising6();
+void falling1();
+void falling2();
+void falling3();
+void falling4();
+void falling5();
+void falling6();
+
 void rising1() {
   attachInterrupt(digitalPinToInterrupt(CH1), falling1, FALLING);
   prev_throttle = micros();
@@ -161,11 +179,11 @@ void falling6() {
 *////////////////////////////////////////////////////////////////
 void AHRSInit() {
   Wire.begin();
-  Wire.setSDA(8);
-  Wire.setSCL(7);
+  Wire.setSDA(SDA);
+  Wire.setSCL(SCL);
   // TWBR = 12;  // 400 kbit/sec I2C speed
 
-  while(!Serial){};
+  // while(!Serial){};
 
   // Set up the interrupt pin, its set as active high, push-pull
   pinMode(intPin, INPUT);
@@ -439,7 +457,7 @@ void AHRSLoop() {
       // Declination of SparkFun Electronics (40°05'26.6"N 105°11'05.9"W) is
       // 	8° 30' E  ± 0° 21' (or 8.5°) on 2016-07-19
       // - http://www.ngdc.noaa.gov/geomag-web/#declination
-      myIMU.yaw  -= 8.5;
+      myIMU.yaw  -= 13.5;
       myIMU.roll *= RAD_TO_DEG;
 
       imuTemp = myIMU.roll;
@@ -550,6 +568,7 @@ void setup() {
   PIDInit();
 
   // calibrate();
+  led.on();
 
 }
 
@@ -577,55 +596,60 @@ void loop() {
   // Serial.print("\t");
   // Serial.println(yawBtm);
 
-  // Serial.print(throttleOut);
-  // Serial.print("\t | \t");
-  // Serial.print(rollOut);
-  // Serial.print("\t | \t");
-  // Serial.print(pitchOut);
-  // Serial.print("\t | \t");
-  // Serial.print(yawOut);
-  // Serial.print("\t | \t");
-  // Serial.print(switch1Out);
-  // Serial.print("\t | \t");
-  // Serial.println(switch2Out);
+  Serial.print(throttleOut);
+  Serial.print("\t | \t");
+  Serial.print(rollOut);
+  Serial.print("\t | \t");
+  Serial.print(pitchOut);
+  Serial.print("\t | \t");
+  Serial.print(yawOut);
+  Serial.print("\t | \t");
+  Serial.print(switch1Out);
+  Serial.print("\t | \t");
+  Serial.println(switch2Out);
 
   // delay(100);
 
-  // if (throttleOut < 5 && yawOut < -95){
-  //   if(armed == false){
-  //     esc1.arm();
-  //     esc2.arm();
-  //     esc3.arm();
-  //     esc4.arm();
-  //     digitalWrite(LED_PIN, HIGH);
-  //     delay(1000);
-  //     armed = true;
-  //   }else{
-  //     esc1.stop();
-  //     esc2.stop();
-  //     esc3.stop();
-  //     esc4.stop();
-  //     digitalWrite(LED_PIN, LOW);
-  //     delay(1000);
-  //     armed = false;
-  //   }
+  if (throttleOut < 10 && yawOut < -90){
+    if(armed == false){
+      esc1.arm();
+      esc2.arm();
+      esc3.arm();
+      esc4.arm();
+      digitalWrite(LED_PIN, HIGH);
+      led.on();
+      delay(1000);
+      armed = true;
+    }else{
+      esc1.stop();
+      esc2.stop();
+      esc3.stop();
+      esc4.stop();
+      digitalWrite(LED_PIN, LOW);
+      led.off();
+      delay(1000);
+      armed = false;
+    }
     
-  // }
-
-  // if(armed == true){
-  //   globalSpeed = map(throttleOut, 0, 100, SPEED_MIN, SPEED_MAX);
-  //   if(globalSpeed<0){globalSpeed = 0;}
-  //   esc1.speed(globalSpeed);
-  //   esc2.speed(globalSpeed);
-  //   esc3.speed(globalSpeed);
-  //   esc4.speed(globalSpeed);
-  // }
+  }
 
   AHRSLoop();
 
-  globalSpeed = map(throttleOut, 0, 100, SPEED_MIN, SPEED_MAX);
+  globalSpeed = map(throttle, throttleBtm, throttleTop, SPEED_MIN, SPEED_MAX);
+  // globalSpeed = 1500;
 
   PIDLoop();
+
+  if(armed == true){
+    if(globalSpeed<SPEED_MIN){globalSpeed = SPEED_MIN;}
+    if(globalSpeed>SPEED_MAX){globalSpeed = SPEED_MAX;};
+    esc1.speed(globalSpeed - rollOutput - pitchOutput);
+    esc2.speed(globalSpeed + rollOutput - pitchOutput);
+    esc3.speed(globalSpeed + rollOutput + pitchOutput);
+    esc4.speed(globalSpeed - rollOutput + pitchOutput);
+  }
+
+  
 
   // Serial.print(myIMU.yaw);
   // Serial.print("\t");
@@ -634,10 +658,25 @@ void loop() {
   // Serial.print(myIMU.roll);
   // Serial.print("\n");
 
-  esc1.speed(globalSpeed - rollOutput - pitchOutput);
-  esc2.speed(globalSpeed + rollOutput - pitchOutput);
-  esc3.speed(globalSpeed + rollOutput + pitchOutput);
-  esc4.speed(globalSpeed - rollOutput + pitchOutput);
-  
+  if(myIMU.pitch < -10 && abs(myIMU.roll) < abs(myIMU.pitch)) {
+    led.red();
+  }else if(myIMU.roll < -10 && abs(myIMU.pitch) < abs(myIMU.roll)) {
+    led.green();
+  }else if(myIMU.pitch > 10 && abs(myIMU.roll) < abs(myIMU.pitch)) {
+    led.blue();
+  }else if(myIMU.roll > 10 && abs(myIMU.pitch) < abs(myIMU.roll)) {
+    led.purple();
+  }else if (armed == true){
+    led.white();
+  }else{
+    led.off();
+  }
 
+  // Serial.print(globalSpeed - rollOutput + pitchOutput);
+  // Serial.print("\t");
+  // Serial.println(globalSpeed + rollOutput + pitchOutput);
+  // Serial.print("\n\n");
+  // Serial.print(globalSpeed - rollOutput - pitchOutput);
+  // Serial.print("\t");
+  // Serial.println(globalSpeed + rollOutput - pitchOutput);
 }

@@ -1,7 +1,7 @@
 #define ESC1 38
 #define ESC2 23
 #define ESC3 2
-#define ESC4 21
+#define ESC4 29
 
 #define SCL 7 //imu
 #define SDA 8
